@@ -13,3 +13,7 @@ class ParExTokenizer:
 
     def batch_decode(self, ids, **kwargs):
         return self.tokenizer.batch_decode(ids, **kwargs)
+
+    @property
+    def pad_token_id(self):
+        return self.tokenizer.pad_token_id

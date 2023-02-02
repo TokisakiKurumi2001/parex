@@ -4,7 +4,7 @@ from collections.abc import Mapping
 import torch
 from torch import Tensor
 from typing import List, Tuple
-from parex import ParExTokenizer
+from ParEx import ParExTokenizer
 from transformers import AutoTokenizer
 
 class ParExDataLoader:

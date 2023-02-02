@@ -1,35 +1,25 @@
 from pytorch_lightning.loggers import WandbLogger
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks.early_stopping import EarlyStopping
-from parex import ParExDataLoader, LitParEx
+from ParEx import ParExDataLoader, LitParEx
 
 if __name__ == "__main__":
-    # wandb_logger = WandbLogger(project="proj_parex")
-    # wandb_logger = WandbLogger(project="proj_dummy")
+    wandb_logger = WandbLogger(project="proj_parex")
 
     # model
     extract_ckpt = 'sentence-transformers/all-MiniLM-L6-v2'
-    gen_ckpt = 'facebook/bart-base'
-    load_pretrained_mapping = False
-    mapping_ck = ""
-    tokenizer_ck = 'parex_tokenizer'
+    gen_ckpt = 'new_bart'
+    tokenizer_ck = 'facebook/bart-base'
 
-    lit_parex = LitParEx(
-        extract_ckpt,
-        gen_ckpt,
-        load_pretrained_mapping,
-        mapping_ck,
-        tokenizer_ck=gen_ckpt
-    )
+    lit_parex = LitParEx(extract_ckpt, gen_ckpt, tokenizer_ck, lr=5e-5, num_beams=4, max_length=128)
 
     # dataloader
-    parex_dataloader = ParExDataLoader(gen_ckpt, extract_ckpt, 80, 40)
-    [train_dataloader, valid_dataloader, test_dataloader] = parex_dataloader.get_dataloader(batch_size=64, types=["train", "valid", "test"])
+    parex_dataloader = ParExDataLoader(tokenizer_ck, extract_ckpt, 128, 64)
+    [train_dataloader, valid_dataloader, test_dataloader] = parex_dataloader.get_dataloader(batch_size=32, types=["train", "valid", "test"])
 
     # train model
-    # trainer = pl.Trainer(max_epochs=2, logger=wandb_logger, devices=[0], accelerator="gpu")#, strategy="ddp")
-    trainer = pl.Trainer(max_epochs=2, accelerator="cpu")
+    trainer = pl.Trainer(max_epochs=20, devices=[1], accelerator="gpu", val_check_interval=1000, logger=wandb_logger)#, strategy="ddp")
     trainer.fit(model=lit_parex, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
+    trainer.test(dataloaders=test_dataloader)
 
-    # # save model & tokenizer
-    # lit_parex.export_model('parex_model/v3/gen', 'parex_model/v3/map')
+    # save model & tokenizer
+    # lit_parex.export_model('parex_model/v1')

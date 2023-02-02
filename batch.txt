@@ -1,0 +1,2 @@
+torch.Size([2, 10])
+torch.Size([2, 10])
