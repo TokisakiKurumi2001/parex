@@ -17,9 +17,9 @@ if __name__ == "__main__":
     [train_dataloader, valid_dataloader, test_dataloader] = parex_dataloader.get_dataloader(batch_size=32, types=["train", "valid", "test"])
 
     # train model
-    trainer = pl.Trainer(max_epochs=20, devices=[1], accelerator="gpu", val_check_interval=1000, logger=wandb_logger)#, strategy="ddp")
+    trainer = pl.Trainer(max_epochs=20, devices=[0], accelerator="gpu", val_check_interval=2000, logger=wandb_logger)#, strategy="ddp")
     trainer.fit(model=lit_parex, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
     trainer.test(dataloaders=test_dataloader)
 
     # save model & tokenizer
-    # lit_parex.export_model('parex_model/v1')
+    lit_pare.export_model('parex_model/v1')
